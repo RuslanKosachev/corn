@@ -4,7 +4,7 @@ package net.krm.optimizer.corn;
 import java.util.*;
 
 /**
- * Фабрика для работы с городами
+ * Класс - Фабрика для работы с городами
  * */
 public class CityFactory implements Comparator<City> {
 

@@ -3,6 +3,9 @@ package net.krm.optimizer.corn;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * Класс реализующий сущность - Город
+ * */
 public class City extends Сoordinates implements KeyI, Serializable, Comparable<City> {
 
     /**
@@ -11,7 +14,7 @@ public class City extends Сoordinates implements KeyI, Serializable, Comparable
     private  String name;
 
     /**
-     * фактор размещения станции
+     * фактор размещения станции (обощающий коэффициент)
      * */
     private Float placementFactor;
 

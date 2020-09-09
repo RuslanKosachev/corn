@@ -3,9 +3,10 @@ package net.krm.optimizer.corn.utils;
 
 import net.krm.optimizer.corn.Сoordinates;
 
+/** Класс для вычислений географических показателей */
 public class Geography {
 
-    /** Радиус земли */
+    /** Средний радиус земли */
     private static int EARTH_RADIUS = 6372795;
 
     /**
