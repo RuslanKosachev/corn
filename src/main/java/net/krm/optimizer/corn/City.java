@@ -3,7 +3,7 @@ package net.krm.optimizer.corn;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class City extends Сoordinates implements KeyI, Serializable {
+public class City extends Сoordinates implements KeyI, Serializable, Comparable<City> {
 
     /**
      * Название
@@ -47,7 +47,7 @@ public class City extends Сoordinates implements KeyI, Serializable {
 
     public void setName(String name) {
         Objects.requireNonNull(name);
-        this.name = name;
+        this.name = name.trim();
     }
 
     public Float getPlacementFactor() {
@@ -64,5 +64,14 @@ public class City extends Сoordinates implements KeyI, Serializable {
 
     public void setCentralCity(City centralCity) {
         this.centralCity = centralCity;
+    }
+
+    @Override
+    public int compareTo(City o) {
+        if (o == null) {
+            return -1;
+        }
+
+        return getName().compareTo(o.getName());
     }
 }
