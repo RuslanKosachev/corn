@@ -7,8 +7,6 @@ public interface DistanceI {
     /**
      * Расстояние между текущей координатой и переданой в аргумент точками
      *
-     * http://gis-lab.info/qa/great-circles.html
-     *
      * @param  last координата {@link Сoordinates}
      * @return расстояние в км
      *

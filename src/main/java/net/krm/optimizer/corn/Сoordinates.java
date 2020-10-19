@@ -9,26 +9,20 @@ import java.util.Objects;
 /**
  * Координаты
  */
-public class Сoordinates implements СoordinatesI, DistanceI, Serializable {
+public class Сoordinates implements СoordinatesI, DistanceI, KeyI, Serializable {
 
 
     /**
      * широта
      */
-    private Float latitude;
+    private float latitude;
 
     /**
      * долгота
      */
-    private Float Longitude;
+    private float Longitude;
 
-    /**
-     * высота
-     */
-    private Float seaLevel;
-
-
-    public Float getLatitude() {
+    public float getLatitude() {
         return latitude;
     }
 
@@ -37,7 +31,7 @@ public class Сoordinates implements СoordinatesI, DistanceI, Serializable {
         this.latitude = latitude;
     }
 
-    public Float getLongitude() {
+    public float getLongitude() {
         return Longitude;
     }
 
@@ -46,34 +40,22 @@ public class Сoordinates implements СoordinatesI, DistanceI, Serializable {
         Longitude = longitude;
     }
 
-    public Float getSeaLevel() {
-        return seaLevel;
-    }
-
-    public void setSeaLevel(Float seaLevel) {
-        this.seaLevel = seaLevel;
-    }
-
-    public Float getKey() {
+    @Override
+    public float getKey() {
         return (latitude + Longitude);
     }
 
     /**
      * расстояние между 2-мя координатами
      */
+    @Override
     public double distance(Сoordinates last) {
         return Geography.distance(this.getLatitude(), this.getLongitude(), last.getLatitude(), last.getLongitude());
     }
 
-
-    public Сoordinates(Float latitude, Float longitude) {
+    public Сoordinates(float latitude, float longitude) {
         setLatitude(latitude);
         setLongitude(longitude);
-    }
-
-    public Сoordinates(Float latitude, Float longitude, Float seaLevel) {
-        this(latitude, longitude);
-        this.seaLevel = seaLevel;
     }
 
     @Override

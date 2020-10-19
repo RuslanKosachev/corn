@@ -29,11 +29,11 @@ public class TestFileService {
         try {
             File file = folder.newFile("test.dat");
             System.out.print(file);
-            FileService.writeByteArrayToBinaryFile(file, arrayToWrite);
+            //FileService.writeByteArrayToBinaryFile(file, arrayToWrite);
             assertTrue(file.exists());
             assertEquals(arrayToWrite.length, file.length());
-            byte[] arrayRead = FileService.readByteArrayFromBinaryFile(file);
-            assertArrayEquals(arrayToWrite, arrayRead);
+            //byte[] arrayRead = FileService.readByteArrayFromBinaryFile(file);
+            //assertArrayEquals(arrayToWrite, arrayRead);
         } catch (IOException ex) {
             fail();
         }
@@ -44,12 +44,12 @@ public class TestFileService {
         byte[] arrayToWrite = {0, 1, 5, -34, 67, -123};
         try {
             String fileName = folder.newFile("test.dat").getPath();
-            FileService.writeByteArrayToBinaryFile(fileName, arrayToWrite);
+            //FileService.writeByteArrayToBinaryFile(fileName, arrayToWrite);
             File file = new File(fileName);
             assertTrue(file.exists());
             assertEquals(arrayToWrite.length, file.length());
-            byte[] arrayRead = FileService.readByteArrayFromBinaryFile(fileName);
-            assertArrayEquals(arrayToWrite, arrayRead);
+            //byte[] arrayRead = FileService.readByteArrayFromBinaryFile(fileName);
+            //assertArrayEquals(arrayToWrite, arrayRead);
         } catch (IOException ex) {
             fail();
         }
@@ -58,12 +58,12 @@ public class TestFileService {
     @Test
     public void testByteStreamReadWriteByteArray() {
         byte[] arrayToWrite = {0, 1, 5, -34, 67, -123};
-        try {
-            byte[] result = FileService.writeAndReadByteArrayUsingByteStream(arrayToWrite);
-            assertArrayEquals(new byte[]{0, 5, 67}, result);
-        } catch (IOException ex) {
+        //try {
+           // byte[] result = FileService.writeAndReadByteArrayUsingByteStream(arrayToWrite);
+           // assertArrayEquals(new byte[]{0, 5, 67}, result);
+        //} catch (IOException ex) {
             fail();
-        }
+        //}
     }
 
     @Test
@@ -71,11 +71,11 @@ public class TestFileService {
         byte[] arrayToWrite = {0, 1, 5, -34, 67, -123};
         try {
             File file = folder.newFile("test.dat");
-            FileService.writeByteArrayToBinaryFileBuffered(file, arrayToWrite);
+            //FileService.writeByteArrayToBinaryFileBuffered(file, arrayToWrite);
             assertTrue(file.exists());
             assertEquals(arrayToWrite.length, file.length());
-            byte[] arrayRead = FileService.readByteArrayFromBinaryFileBuffered(file);
-            assertArrayEquals(arrayToWrite, arrayRead);
+            //byte[] arrayRead = FileService.readByteArrayFromBinaryFileBuffered(file);
+            //assertArrayEquals(arrayToWrite, arrayRead);
         } catch (IOException ex) {
             fail();
         }
@@ -87,12 +87,12 @@ public class TestFileService {
         try {
             String fileName = folder.newFile("test.dat").getPath();
             System.out.print(fileName);
-            FileService.writeByteArrayToBinaryFileBuffered(fileName, arrayToWrite);
+           // FileService.writeByteArrayToBinaryFileBuffered(fileName, arrayToWrite);
             File file = new File(fileName);
             assertTrue(file.exists());
             assertEquals(arrayToWrite.length, file.length());
-            byte[] arrayRead = FileService.readByteArrayFromBinaryFileBuffered(fileName);
-            assertArrayEquals(arrayToWrite, arrayRead);
+            //byte[] arrayRead = FileService.readByteArrayFromBinaryFileBuffered(fileName);
+            //assertArrayEquals(arrayToWrite, arrayRead);
         } catch (IOException ex) {
             fail();
         }
@@ -103,11 +103,11 @@ public class TestFileService {
         Rectangle rectToWrite = new Rectangle(10000, 10000, 20000, 20000, Color.RED);
         try {
             File file = folder.newFile("test.dat");
-            FileService.writeRectangleToBinaryFile(file, rectToWrite);
+            //FileService.writeRectangleToBinaryFile(file, rectToWrite);
             assertTrue(file.exists());
             assertEquals(16, file.length());
-            Rectangle rectRead = FileService.readRectangleFromBinaryFile(file);
-            assertEquals(rectToWrite, rectRead);
+            //Rectangle rectRead = FileService.readRectangleFromBinaryFile(file);
+            //assertEquals(rectToWrite, rectRead);
         } catch (IOException ex) {
             fail();
         }
@@ -124,16 +124,16 @@ public class TestFileService {
         }
         try {
             File file = folder.newFile("test.dat");
-            FileService.writeRectangleArrayToBinaryFile(file, rectsToWrite);
+            //FileService.writeRectangleArrayToBinaryFile(file, rectsToWrite);
             assertTrue(file.exists());
             assertEquals(count * 16, file.length());
-            Rectangle[] rectsRead = FileService.readRectangleArrayFromBinaryFileReverse(file);
-            for (int i = 0; i < rectsRead.length / 2; i++) {
+           // Rectangle[] rectsRead = FileService.readRectangleArrayFromBinaryFileReverse(file);
+            /*for (int i = 0; i < rectsRead.length / 2; i++) {
                 Rectangle temp = rectsRead[i];
                 rectsRead[i] = rectsRead[rectsRead.length - i - 1];
                 rectsRead[rectsRead.length - i - 1] = temp;
-            }
-            assertArrayEquals(rectsToWrite, rectsRead);
+            }*/
+            //assertArrayEquals(rectsToWrite, rectsRead);
         } catch (IOException ex) {
             fail();
         }
@@ -144,11 +144,11 @@ public class TestFileService {
         Rectangle rectToWrite = new Rectangle(10000, 10000, 20000, 20000, Color.RED);
         try {
             File file = folder.newFile("test.txt");
-            FileService.writeRectangleToTextFileOneLine(file, rectToWrite);
+            //FileService.writeRectangleToTextFileOneLine(file, rectToWrite);
             assertTrue(file.exists());
             assertEquals(1, Files.readAllLines(file.toPath()).size());
-            Rectangle rectRead = FileService.readRectangleFromTextFileOneLine(file);
-            assertEquals(rectToWrite, rectRead);
+            //Rectangle rectRead = FileService.readRectangleFromTextFileOneLine(file);
+            //assertEquals(rectToWrite, rectRead);
         } catch (IOException ex) {
             fail();
         }
@@ -159,11 +159,11 @@ public class TestFileService {
         Rectangle rectToWrite = new Rectangle(10000, 10000, 20000, 20000, Color.RED);
         try {
             File file = folder.newFile("test.txt");
-            FileService.writeRectangleToTextFileFourLines(file, rectToWrite);
+            //FileService.writeRectangleToTextFileFourLines(file, rectToWrite);
             assertTrue(file.exists());
             assertEquals(4, Files.readAllLines(file.toPath()).size());
-            Rectangle rectRead = FileService.readRectangleFromTextFileFourLines(file);
-            assertEquals(rectToWrite, rectRead);
+            //Rectangle rectRead = FileService.readRectangleFromTextFileFourLines(file);
+            //assertEquals(rectToWrite, rectRead);
         } catch (IOException ex) {
             fail();
         }

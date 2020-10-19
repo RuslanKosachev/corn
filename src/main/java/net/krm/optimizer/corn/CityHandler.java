@@ -2,40 +2,43 @@ package net.krm.optimizer.corn;
 
 
 import java.util.*;
+import java.util.HashSet;
 
 /**
  * Класс - Фабрика для работы с городами
  * */
-public class CityFactory implements Comparator<City> {
+public class CityHandler implements Comparator<City> {
 
     /***
-     * Критерий установки соседнего ВСЦ regarding the main
+     * «Зона обслуживания» в км
      */
-    public static final Integer  RELATIVE_TO_NEIGHORING = 70;
+    public static final int RELATIVE_TO_NEIGHORING = 70;
 
     /***
-     * Критерий установки ВСЦ относительно ГСЦ
+     * Критерий установки РДЦ относительно ОДЦ  в км
      */
-    public static final Integer RELATIVE_TO_MAIN = 140;
+    public static final int RELATIVE_TO_MAIN = 140;
 
     /**
-     * Города области
+     * Города области районного значения, рассматриваются как потенциальные места для размещения РДЦ
      * */
-    public  Set<City> cities = new TreeSet<>(this);
+    public  List<City> cities = new LinkedList<>();
+
+    /**
+     * Города области районного значения, рассматриваются как потенциальные места для размещения РДЦ
+     * */
+    public  Set<City>  citiesPossible = new TreeSet<>(this);
 
     /**
      * Центр области
      * */
     public  City centralCity = null;
 
-    /**
-     * Необходимое кол-во впомогательных сервисных центров в данно области
-     * */
-    public  int countOfSubsidiary = 0;
+    private CityHandler() {}
 
-    public static CityFactory getInstance(String value) {
+    public static CityHandler getInstance() {
         if (instance == null) {
-            instance = new CityFactory(value);
+            instance = new CityHandler();
         }
         return instance;
     }
@@ -47,20 +50,6 @@ public class CityFactory implements Comparator<City> {
         return cities.size();
     }
 
-    /**
-     *  Устанавливает количество {@link City} равным 0
-     * */
-    public void clear(){
-        cities.clear();
-    }
-
-    public int getCountOfSubsidiary() {
-        return countOfSubsidiary;
-    }
-
-    public void setCountOfSubsidiary(int countOfSubsidiary) {
-        this.countOfSubsidiary = countOfSubsidiary;
-    }
 
     /**
      * Создает {@link City} по долготе, широте, названию
@@ -151,16 +140,16 @@ public class CityFactory implements Comparator<City> {
             return 1;
         }
 
-        if (o1.getPlacementFactor() == null) {
-            return -1;
-        } else if (o2.getPlacementFactor() == null) {
-            return 1;
-        }
 
-        return o1.getPlacementFactor().compareTo(o2.getPlacementFactor());
+        if (o1.getCoefficientPlacement() < o2.getCoefficientPlacement()) {
+            return 1;
+        } else if (o1.getCoefficientPlacement() > o2.getCoefficientPlacement()) {
+            return -1;
+        } else {
+            return 0;
+        }
     }
 
-    private static CityFactory instance;
+    private static CityHandler instance;
 
-    private CityFactory(String value) {}
 }

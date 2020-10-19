@@ -3,7 +3,7 @@ package net.krm.optimizer.colors;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-import net.krm.optimizer.cars.Car;
+//import net.krm.optimizer.cars.Car;
 import org.junit.Test;
 
 import net.krm.optimizer.figures.v3.Circle;
@@ -29,7 +29,7 @@ public class TestColor {
         coloredObjects[0] = new Circle(10, 20, 10, Color.BLUE);
         coloredObjects[1] = new Rectangle(10, 20, 30, 40, Color.BLUE);
         coloredObjects[2] = new Triangle(new Point2D(2, 0), new Point2D(-1, 0), new Point2D(0, 2), Color.BLUE);
-        coloredObjects[3] = new Car("Tesla", 1500, 400, Color.BLUE);
+        //coloredObjects[3] = new Car("Tesla", 1500, 400, Color.BLUE);
 
         for (Colored colored : coloredObjects)
             colored.setColor(Color.GREEN);

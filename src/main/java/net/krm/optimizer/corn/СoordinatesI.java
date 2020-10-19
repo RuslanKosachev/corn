@@ -7,10 +7,10 @@ public interface СoordinatesI {
     /**
      * возвращает широту
      */
-    public Float getLatitude();
+    float getLatitude();
 
     /**
      * возвращает долготу
      */
-    public Float getLongitude();
+    float getLongitude();
 }

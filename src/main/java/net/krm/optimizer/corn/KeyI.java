@@ -5,5 +5,5 @@ public interface KeyI {
     /**
      * возвращает уникальный идентификатор объекта
      * */
-    public Float getKey();
+    float getKey();
 }
