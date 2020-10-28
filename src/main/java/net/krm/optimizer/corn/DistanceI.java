@@ -1,7 +1,5 @@
 package net.krm.optimizer.corn;
 
-import net.krm.optimizer.corn.utils.Geography;
-
 public interface DistanceI {
 
     /**

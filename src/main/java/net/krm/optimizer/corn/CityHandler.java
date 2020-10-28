@@ -1,71 +1,63 @@
 package net.krm.optimizer.corn;
 
 
+import net.krm.optimizer.corn.utils.Calculator;
+
 import java.util.*;
-import java.util.HashSet;
 
 /**
  * Класс - Фабрика для работы с городами
  * */
-public class CityHandler implements Comparator<City> {
+public class CityHandler {
 
-    /***
-     * «Зона обслуживания» в км
-     */
-    public static final int RELATIVE_TO_NEIGHORING = 70;
-
-    /***
-     * Критерий установки РДЦ относительно ОДЦ  в км
-     */
-    public static final int RELATIVE_TO_MAIN = 140;
+    /**
+     * Заданные города области условной области над которыми бужет произволится обработка
+     * */
+    public List<City> cities = new LinkedList<>();
 
     /**
      * Города области районного значения, рассматриваются как потенциальные места для размещения РДЦ
+     *
+     * должны быть только города находящиеся на равном либо большем расстоянии
+     * соответсвующему критерию удаленность от ОДЦ {@link City#RELATIVE_TO_CENTRAL_CITY_M}
+     *
      * */
-    public  List<City> cities = new LinkedList<>();
+    public Set<City> citiesPossible = new HashSet<>();
 
     /**
-     * Города области районного значения, рассматриваются как потенциальные места для размещения РДЦ
+     * Центр области условной области
      * */
-    public  Set<City>  citiesPossible = new TreeSet<>(this);
-
-    /**
-     * Центр области
-     * */
-    public  City centralCity = null;
-
-    private CityHandler() {}
-
-    public static CityHandler getInstance() {
-        if (instance == null) {
-            instance = new CityHandler();
-        }
-        return instance;
-    }
-
-    /**
-     * Возвращает количество городов
-     * */
-    public int getCount(){
-        return cities.size();
-    }
-
+    public City centralCity = null;
 
     /**
      * Создает {@link City} по долготе, широте, названию
      * и добавляет в фабрику
      * */
-    public City add(Float latitude, Float longitude, String name) {
+    public City addCity(Float latitude, Float longitude, String name) {
         City city = new City(latitude, longitude, name);
-        add(city);
+        addCity(city);
         return city;
     }
 
     /**
      * Добавляет {@link City}
      * */
-    public boolean add(City city) {
+    public boolean addCity(City city) {
         return cities.add(city);
+    }
+
+    /**
+     * Возвращает количество заданных городов
+     * */
+    public int getCountCity(){
+        return cities.size();
+    }
+
+    public List<City> getCities() {
+        if (cities == null) {
+            cities = new LinkedList<City>();
+        }
+        return cities;
     }
 
     /**
@@ -74,26 +66,116 @@ public class CityHandler implements Comparator<City> {
      *  @param centralCity центр области
      * */
     public void setCentralCity(City centralCity) {
-        for (City city : cities) {
-            city.setCentralCity(centralCity);
-        }
         this.centralCity = centralCity;
     }
 
-    public Set<City> centralCityFilter() {
+    public City getCentralCity() {
+        return centralCity;
+    }
+
+    public Set<City> getCitiesPossible() {
+        if (citiesPossible == null) {
+            citiesPossible = new HashSet<City>();
+        }
+
+        return citiesPossible;
+    }
+
+    public void filterRelativeCentralCity() {
+        System.out.println("filterRelativeCentralCity()... ");
+        if (getCentralCity() == null) {
+            System.out.println("не задан центр области");
+            return;
+        }
+
         for (City city : cities) {
-            if (city.distance(city.getCentralCity()) >= RELATIVE_TO_MAIN) {
-                cities.remove(city);
+            if (City.RELATIVE_TO_CENTRAL_CITY_M + City.DELTA_M <= city.distance(getCentralCity())) {
+                getCitiesPossible().add(city);
             }
         }
-        return cities;
+    }
+
+    public void calcCoefficientPlacement() {
+        Calculator.calcCoefficientPlacement(cities);
+    }
+
+
+    /**
+     * Грода попадающие в зону обслуживани друг друга {@link City#SERVICE_ZONE_M}
+     * */
+    public Set<Set<City>> aggregatedByServiceArea = new HashSet<>();
+
+    public Set<Set<City>> getAggregatedByServiceArea() {
+        if (aggregatedByServiceArea == null) {
+            aggregatedByServiceArea = new HashSet<>();
+        }
+        return aggregatedByServiceArea;
+    }
+
+    /**
+     * агрегируем города по "зоне обслуживания" {@link City#SERVICE_ZONE_M}
+     */
+    public void aggregatedByServiceArea() {
+        System.out.println("aggregatedByServiceArea()...  ");
+
+        if (getCitiesPossible().isEmpty()) {
+            System.out.println("aggregatedByServiceArea() getCitiesPossible().isEmpty()=" + getCitiesPossible().isEmpty());
+            return;
+        }
+
+
+        Set<Set<City>> aggregatedByServiceArea = new HashSet<>();
+        Set<City> citiesAggNew;
+        boolean addInSet = false; // флаг добавлния нового города
+        boolean addInSingleSet = false; // флаг добавлния нового города в новое множество
+        for (City cityNew : getCitiesPossible()) {
+            System.out.println("aggregatedByServiceArea()  cityNew=" + cityNew);
+
+            addInSingleSet = true;
+            // итерация по агрегированным множествам
+            for (Set<City> citiesAgg : getAggregatedByServiceArea()) {
+                addInSet = true;
+                citiesAggNew = new TreeSet<City>(new ComparatorCityPlacement());
+                // итерация по агрегированному множеству
+                for (City cityAgg : citiesAgg) {
+                    System.out.println("aggregatedByServiceArea() cityAgg(" + cityAgg.getName() + ")<->cityNew(" + cityNew.getName() +  ") distance=" + cityAgg.distance(cityNew));
+                    if ((City.SERVICE_ZONE_M + City.DELTA_M >= cityAgg.distance(cityNew))) {
+                        citiesAggNew.add(cityAgg);
+                    } else {
+                        addInSet = false;
+                    }
+                }
+
+                if (addInSet) {
+                    citiesAgg.add(cityNew);
+                    addInSingleSet = false;
+                } else if (!citiesAggNew.isEmpty()) {
+                    citiesAggNew.add(cityNew);
+                    aggregatedByServiceArea.add(citiesAggNew);
+                    addInSingleSet = false;
+                }
+            }
+
+            // если город никуда не добавленн он одиночка и входит в новое множество
+            if (addInSingleSet) {
+                citiesAggNew = new TreeSet<City>(new ComparatorCityPlacement());
+                citiesAggNew.add(cityNew);
+                getAggregatedByServiceArea().add(citiesAggNew);
+                System.out.println("aggregatedByServiceArea()  n=" + getAggregatedByServiceArea().size());
+            }
+
+            if (!aggregatedByServiceArea.isEmpty()) {
+                getAggregatedByServiceArea().addAll(aggregatedByServiceArea);
+                aggregatedByServiceArea.clear();
+            }
+        }
     }
 
     /**
      *  Возвращает список вариантов городов где возможно необходимо разместить впомогательные СЦ
      * */
     // todo перенести в отдельный класс
-    public List<List<City>> getOptions(Set<City> cities, Integer countOfSubsidiary){
+    /*public List<List<City>> getOptions(Set<City> cities, Integer countOfSubsidiary){
         if (Objects.isNull(countOfSubsidiary) || getCountOfSubsidiary() <= 0) {
             return null;
         }
@@ -126,30 +208,6 @@ public class CityHandler implements Comparator<City> {
 
 
         return  possiblePlacements;
-    }
-
-    // todo перенести в City
-    @Override
-    public int compare(City o1, City o2) {
-        //Objects.equals(o1.getPlacementFactor(), o2.getPlacementFactor())
-        if (o1 == null && o2 == null) {
-            return 0;
-        } else if (o1 == null) {
-            return -1;
-        } else if (o2 == null) {
-            return 1;
-        }
-
-
-        if (o1.getCoefficientPlacement() < o2.getCoefficientPlacement()) {
-            return 1;
-        } else if (o1.getCoefficientPlacement() > o2.getCoefficientPlacement()) {
-            return -1;
-        } else {
-            return 0;
-        }
-    }
-
-    private static CityHandler instance;
+    }*/
 
 }

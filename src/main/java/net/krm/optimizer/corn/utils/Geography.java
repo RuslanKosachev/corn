@@ -6,11 +6,13 @@ import net.krm.optimizer.corn.Сoordinates;
 /** Класс для вычислений географических показателей */
 public class Geography {
 
-    /** Средний радиус земли */
+    /**
+     * Средний радиус земли, м
+     * */
     private static int EARTH_RADIUS = 6372795;
 
     /**
-     * Расстояние между двумя точками
+     * Расстояние между двумя точками, м
      *
      * http://gis-lab.info/qa/great-circles.html
      *
@@ -21,7 +23,8 @@ public class Geography {
      * @return расстояние в км
      *
      */
-    public static double distance(Float latitudeF, Float longitudeF, Float latitudeL, Float longitudeL) {
+    public static int distance(Float latitudeF, Float longitudeF,
+                                  Float latitudeL, Float longitudeL) {
 
         // перевести координаты в радианы
         double lat1 = Math.toRadians(latitudeF);
@@ -43,15 +46,17 @@ public class Geography {
         double x = sl1 * sl2 + cl1 * cl2 * cdelta;
 
         double ad = Math.atan2(y, x);
-        double dist = ad * EARTH_RADIUS;
+        int dist = Math.round((float) ad * EARTH_RADIUS);
 
         return dist;
     }
 
     /**
-     * расстояние между 2-мя точками обьектами {@link Сoordinates}
+     * расстояние между 2-мя точками обьектами, м
+     * {@link Сoordinates}
      */
     public static double distance(Сoordinates first, Сoordinates last) {
-        return distance(first.getLatitude(), first.getLongitude(), last.getLatitude(), last.getLongitude());
+        return distance(first.getLatitude(), first.getLongitude(),
+                        last.getLatitude(), last.getLongitude());
     }
 }

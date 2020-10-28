@@ -1,12 +1,27 @@
 package net.krm.optimizer.corn;
 
 import java.io.Serializable;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Класс реализующий сущность - Город
  * */
 public class City extends Сoordinates implements Serializable, Comparable<City> {
+
+    /***
+     * «Зона обслуживания», м
+     */
+    public static final int SERVICE_ZONE_M = 70000;
+
+    /***
+     * Критерий установки РДЦ относительно ОДЦ, м
+     */
+    public static final int RELATIVE_TO_CENTRAL_CITY_M = 140000;
+
+    /**
+     *  Допустимая разница между расстояниями "зоны обслуживания" и 2-мя городами, м
+     * */
+    public static final double DELTA_M = 500;
 
     /**
      * Название
@@ -20,42 +35,17 @@ public class City extends Сoordinates implements Serializable, Comparable<City>
     private int countServicedEquipment;
 
     /**
-     *  Кд - условный коэффициент доступности (размещения) Кд
+     *  Кт - условный "коэффициент размещения"
      *
-     *  Kд = Kт + Kти
+     *  Kт – коэффициент, зависящий от количества обслуживаемой техники
+     *  в «Зоне обслуживания» условного РДЦ
      * */
     private float coefficientPlacement;
 
     /**
-     * Kт – коэффициент, зависящий от количества обслуживаемой техники в «Зоне обслуживания» условного РДЦ
+     * место установки РДЦ
      * */
-    private float coefficientServicedEquipment;
-
-    /**
-     * Kти – коэффициент, зависящий от удобства транспортной инфраструк-туры района
-     *
-     * Если районный и областной центры соединяются напрямую автомо-бильной дорогой федерального
-     * значения и имеют класс «Автомаги-страль» или «Скоростная дорога», то KТИ = 1, если класс
-     * «дорога обыч-ного типа (не скоростная дорога)», то KТИ =0,9; если районный и об-ластной
-     * центры соединяются напрямую автомобильной дорогой регио-нального или межмуниципального
-     * значения и имеют класс «Автомаги-страль» или «Скоростная дорога», то KТИ = 0,75, если
-     * класс «дорога обычного типа (не скоростная дорога)», то KТИ =0,7; если районный и областной
-     * центры соединяются напрямую автомобильной дорогой местного значения, то KТИ =0,5; если
-     * районный и областной центры со-единяются между собой разными типами автомобильных дорог,
-     * то ко-эффициент определяется составлением и решением «Золотой пропор-ции»
-     */
-    private float coefficientTransportInfrastructure;
-
-    /**
-     * Измнение коэффициэнтов
-     * */
-    private boolean changed = true;
-
-    /**
-     * является областным центром или районным
-     * если районный центр то есть ссылка а областной
-     * */
-    private City centralCity;
+    private boolean install = false;
 
 
     public City(float latitude, float longitude, String name) {
@@ -64,8 +54,15 @@ public class City extends Сoordinates implements Serializable, Comparable<City>
         this.name = name;
     }
 
+    public City(float latitude, float longitude, int countServicedEquipment, String name) {
+        super(latitude, longitude);
+
+        setCountServiceEquipment(countServicedEquipment);
+        setName(name);
+    }
+
     public String getName() {
-        if (name == null) {
+        if (name == null || name.trim().isEmpty()) {
             return "noName";
         }
         return name;
@@ -76,46 +73,28 @@ public class City extends Сoordinates implements Serializable, Comparable<City>
         this.name = name.trim();
     }
 
-    public int getCountServicedEquipment() {
+    public int getCountServiceEquipment() {
         return countServicedEquipment;
     }
 
-    public void setCountServicedEquipment(int countServicedEquipment) {
+    public void setCountServiceEquipment(int countServicedEquipment) {
         this.countServicedEquipment = countServicedEquipment;
     }
 
     public float getCoefficientPlacement() {
-        if (changed) {
-            coefficientPlacement = getCoefficientServicedEquipment() + getCoefficientTransportInfrastructure();
-        }
-
         return coefficientPlacement;
     }
 
-    public float getCoefficientServicedEquipment() {
-        return coefficientServicedEquipment;
+    public void setCoefficientPlacement(float coefficientPlacement) {
+        this.coefficientPlacement = coefficientPlacement;
     }
 
-    public void setCoefficientServicedEquipment(float coefficientServicedEquipment) {
-        this.coefficientServicedEquipment = coefficientServicedEquipment;
-        changed = true;
+    public boolean isInstall() {
+        return install;
     }
 
-    public float getCoefficientTransportInfrastructure() {
-        return coefficientTransportInfrastructure;
-    }
-
-    public void setCoefficientTransportInfrastructure(float coefficientTransportInfrastructure) {
-        this.coefficientTransportInfrastructure = coefficientTransportInfrastructure;
-        changed = true;
-    }
-
-    public City getCentralCity() {
-        return centralCity;
-    }
-
-    public void setCentralCity(City centralCity) {
-        this.centralCity = centralCity;
+    public void setInstall(boolean install) {
+        this.install = install;
     }
 
     @Override
@@ -125,5 +104,10 @@ public class City extends Сoordinates implements Serializable, Comparable<City>
         }
 
         return getName().compareTo(o.getName());
+    }
+
+    @Override
+    public String toString() {
+        return String.format("г.%s:{equipment=%s coefficient=%s}\n", getName(), getCountServiceEquipment(), getCoefficientPlacement());
     }
 }
