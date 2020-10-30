@@ -45,13 +45,14 @@ public class City extends Сoordinates implements Serializable, Comparable<City>
     /**
      * место установки РДЦ
      * */
-    private boolean install = false;
+    private boolean install = true;
 
 
     public City(float latitude, float longitude, String name) {
         super(latitude, longitude);
 
-        this.name = name;
+        setName(name);
+        setInstall(true);
     }
 
     public City(float latitude, float longitude, int countServicedEquipment, String name) {
@@ -59,6 +60,7 @@ public class City extends Сoordinates implements Serializable, Comparable<City>
 
         setCountServiceEquipment(countServicedEquipment);
         setName(name);
+        setInstall(true);
     }
 
     public String getName() {
@@ -108,6 +110,6 @@ public class City extends Сoordinates implements Serializable, Comparable<City>
 
     @Override
     public String toString() {
-        return String.format("г.%s:{equipment=%s coefficient=%s}\n", getName(), getCountServiceEquipment(), getCoefficientPlacement());
+        return String.format("г.%-20s:{equipment=%-2s coefficient=%-4s install=%-5s}", getName(), getCountServiceEquipment(), getCoefficientPlacement(), isInstall());
     }
 }

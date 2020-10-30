@@ -15,6 +15,7 @@ import java.util.*;
 public class Calculator {
 
     public static void calcCoefficientPlacement(List<City> cities) {
+        System.out.println("calcCoefficientPlacement().....");
         if (cities == null || cities.isEmpty()) {
             return;
         }
@@ -26,12 +27,11 @@ public class Calculator {
         if (0 >= max) {
             return;
         }
-            System.out.println("calcCoefficientPlacement max                   =" + max);
 
+        System.out.println("------------------------------------------------------------------------------------------------");
+        System.out.println("max countEquipment         :" + max);
 
         cities.forEach((city) -> {
-            System.out.println("calcCoefficientPlacement city                  =" + city.getName());
-            System.out.println("calcCoefficientPlacement countServicedEquipment=" + city.getCountServiceEquipment());
             if (0 < city.getCountServiceEquipment()) {
                 city.setCoefficientPlacement(
                         BigDecimal.valueOf(city.getCountServiceEquipment())
@@ -40,7 +40,8 @@ public class Calculator {
                                 .floatValue()
                 );
             }
-            System.out.println("calcCoefficientPlacement coefficientPlacement  =" + city.getCoefficientPlacement());
+            System.out.println(String.format("city г.%-20s:{countEquipment=%-2s coefficient=%-4s}", city.getName(), city.getCountServiceEquipment(), city.getCoefficientPlacement()));
         });
+        System.out.println("------------------------------------------------------------------------------------------------");
     }
 }

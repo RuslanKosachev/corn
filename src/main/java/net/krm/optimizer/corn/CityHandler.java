@@ -33,10 +33,8 @@ public class CityHandler {
      * Создает {@link City} по долготе, широте, названию
      * и добавляет в фабрику
      * */
-    public City addCity(Float latitude, Float longitude, String name) {
-        City city = new City(latitude, longitude, name);
-        addCity(city);
-        return city;
+    public boolean addCity(Float latitude, Float longitude, int countServicedEquipment, String name) {
+        return addCity(new City(latitude, longitude, countServicedEquipment, name));
     }
 
     /**
@@ -93,6 +91,9 @@ public class CityHandler {
                 getCitiesPossible().add(city);
             }
         }
+        System.out.println("------------------------------------------------------------------------------------------------");
+        System.out.println("citiesPossible: " + getCitiesPossible().size());
+        System.out.println("------------------------------------------------------------------------------------------------");
     }
 
     public void calcCoefficientPlacement() {
@@ -103,42 +104,36 @@ public class CityHandler {
     /**
      * Грода попадающие в зону обслуживани друг друга {@link City#SERVICE_ZONE_M}
      * */
-    public Set<Set<City>> aggregatedByServiceArea = new HashSet<>();
+    public Set<SortedSet<City>> aggregatedCitiesByServiceArea = new HashSet<>();
 
-    public Set<Set<City>> getAggregatedByServiceArea() {
-        if (aggregatedByServiceArea == null) {
-            aggregatedByServiceArea = new HashSet<>();
+    public Set<SortedSet<City>> getAggregatedCitiesByServiceArea() {
+        if (aggregatedCitiesByServiceArea == null) {
+            aggregatedCitiesByServiceArea = new HashSet<>();
         }
-        return aggregatedByServiceArea;
+        return aggregatedCitiesByServiceArea;
     }
 
     /**
      * агрегируем города по "зоне обслуживания" {@link City#SERVICE_ZONE_M}
      */
-    public void aggregatedByServiceArea() {
-        System.out.println("aggregatedByServiceArea()...  ");
+    public void aggregatedCitiesByServiceArea() {
+        System.out.println("aggregatedCitiesByServiceArea()...  ");
 
-        if (getCitiesPossible().isEmpty()) {
-            System.out.println("aggregatedByServiceArea() getCitiesPossible().isEmpty()=" + getCitiesPossible().isEmpty());
-            return;
-        }
-
-
-        Set<Set<City>> aggregatedByServiceArea = new HashSet<>();
-        Set<City> citiesAggNew;
+        Set<SortedSet<City>> aggregatedByServiceArea = new HashSet<>();
+        SortedSet<City> citiesAggNew;
         boolean addInSet = false; // флаг добавлния нового города
         boolean addInSingleSet = false; // флаг добавлния нового города в новое множество
         for (City cityNew : getCitiesPossible()) {
-            System.out.println("aggregatedByServiceArea()  cityNew=" + cityNew);
+            System.out.println("aggregatedCitiesByServiceArea()  cityNew=" + cityNew);
 
             addInSingleSet = true;
             // итерация по агрегированным множествам
-            for (Set<City> citiesAgg : getAggregatedByServiceArea()) {
+            for (Set<City> citiesAgg : getAggregatedCitiesByServiceArea()) {
                 addInSet = true;
                 citiesAggNew = new TreeSet<City>(new ComparatorCityPlacement());
                 // итерация по агрегированному множеству
                 for (City cityAgg : citiesAgg) {
-                    System.out.println("aggregatedByServiceArea() cityAgg(" + cityAgg.getName() + ")<->cityNew(" + cityNew.getName() +  ") distance=" + cityAgg.distance(cityNew));
+                    //System.out.println("aggregatedCitiesByServiceArea() cityAgg(" + cityAgg.getName() + ")<->cityNew(" + cityNew.getName() +  ") distance=" + cityAgg.distance(cityNew));
                     if ((City.SERVICE_ZONE_M + City.DELTA_M >= cityAgg.distance(cityNew))) {
                         citiesAggNew.add(cityAgg);
                     } else {
@@ -149,10 +144,14 @@ public class CityHandler {
                 if (addInSet) {
                     citiesAgg.add(cityNew);
                     addInSingleSet = false;
+
+                    install(citiesAgg);
                 } else if (!citiesAggNew.isEmpty()) {
                     citiesAggNew.add(cityNew);
                     aggregatedByServiceArea.add(citiesAggNew);
                     addInSingleSet = false;
+
+                    install(citiesAggNew);
                 }
             }
 
@@ -160,54 +159,69 @@ public class CityHandler {
             if (addInSingleSet) {
                 citiesAggNew = new TreeSet<City>(new ComparatorCityPlacement());
                 citiesAggNew.add(cityNew);
-                getAggregatedByServiceArea().add(citiesAggNew);
-                System.out.println("aggregatedByServiceArea()  n=" + getAggregatedByServiceArea().size());
+                getAggregatedCitiesByServiceArea().add(citiesAggNew);
+                //System.out.println("aggregatedCitiesByServiceArea()  n=" + getAggregatedCitiesByServiceArea().size());
             }
 
             if (!aggregatedByServiceArea.isEmpty()) {
-                getAggregatedByServiceArea().addAll(aggregatedByServiceArea);
+                getAggregatedCitiesByServiceArea().addAll(aggregatedByServiceArea);
                 aggregatedByServiceArea.clear();
+            }
+        }
+
+        printAggregatedCitiesByServiceArea(getAggregatedCitiesByServiceArea());
+    }
+
+    /**
+     * Возвращает список полученных городов для устанавки РДЦ {@link City#SERVICE_ZONE_M}
+     */
+    public Set<City> getCitiesForDealerships() {
+        System.out.println("getCitiesForDealerships()...");
+
+        Set<City> cities = new HashSet<>();
+        for (SortedSet<City> citiesAgg : getAggregatedCitiesByServiceArea()) {
+            if (citiesAgg.isEmpty()) {
+                continue;
+            }
+            if (citiesAgg.last().isInstall()) {
+                cities.add(citiesAgg.last());
+            }
+        }
+
+        printCitiesForDealerships(cities);
+
+        return cities;
+    }
+
+    private void install(Collection<City> cities) {
+        int i = 0;
+        for (City c : cities) {
+            i++;
+            //System.out.println("aggregatedCitiesByServiceArea() out n:" + cities.size() + " i:" + i + " cityAgg:" + c.getName());
+            if (i < cities.size()) {
+                c.setInstall(false);
             }
         }
     }
 
-    /**
-     *  Возвращает список вариантов городов где возможно необходимо разместить впомогательные СЦ
-     * */
-    // todo перенести в отдельный класс
-    /*public List<List<City>> getOptions(Set<City> cities, Integer countOfSubsidiary){
-        if (Objects.isNull(countOfSubsidiary) || getCountOfSubsidiary() <= 0) {
-            return null;
-        }
-        if (Objects.isNull(cities) || cities.isEmpty()) {
-            return null;
-        }
-
-        Queue<City> possibleСities = new ArrayDeque<>(cities);
-        List<List<City>> possiblePlacements = new LinkedList<>();
-        List<City> possiblePlacement = new ArrayList<>(getCountOfSubsidiary());
-
-        while (possibleСities.peek() != null) {
-            if (!possiblePlacement.isEmpty()) {
-                for (City city : possiblePlacement) {
-                    if (city.distance(possibleСities.peek()) > RELATIVE_TO_NEIGHORING) {
-                        break;
-                    }
-                    possiblePlacement.add(possibleСities.poll());
-                }
-            } else {
-                // первый элемент добавляем бе проверки
-                possiblePlacement.add(possibleСities.poll());
+    public void printAggregatedCitiesByServiceArea(Set<SortedSet<City>> aggregatedCities) {
+        System.out.println("------------------------------------------------------------------------------------------------");
+            System.out.println("aggregated cities by service area n:" + aggregatedCities.size());
+        for (SortedSet<City> cities : aggregatedCities) {
+            System.out.print("[");
+            for (City city : cities) {
+                System.out.print("\n  " + city + ", ");
             }
-
-            if (possiblePlacement.size() >= getCountOfSubsidiary()) {
-                possiblePlacements.add(possiblePlacement);
-                possiblePlacement = new ArrayList<>(getCountOfSubsidiary());
-            }
+            System.out.println("],");
         }
+        System.out.println("------------------------------------------------------------------------------------------------");
+    }
 
-
-        return  possiblePlacements;
-    }*/
-
+    public void printCitiesForDealerships(Set<City> cities) {
+        System.out.println("------------------------------------------------------------------------------------------------");
+        System.out.println("cities for dealerships n:" + cities.size());
+        for (City city : cities) {
+            System.out.println("                         " + city);
+        }
+    }
 }
