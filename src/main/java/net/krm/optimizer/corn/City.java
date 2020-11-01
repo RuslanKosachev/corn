@@ -14,7 +14,7 @@ public class City extends Сoordinates implements Serializable, Comparable<City>
     public static final int SERVICE_ZONE_M = 70000;
 
     /***
-     * Критерий установки РДЦ относительно ОДЦ, м
+     * Критерий минимальной удаленности расположения РДЦ относительно ОДЦ, м
      */
     public static final int RELATIVE_TO_CENTRAL_CITY_M = 140000;
 

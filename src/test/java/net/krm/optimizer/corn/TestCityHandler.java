@@ -9,8 +9,7 @@ public class TestCityHandler {
     public void testAddCity() {
         CityHandler handler = new CityHandler();
 
-        City sratov = new City(51.528594f, 46.027980f, "Саратов");
-        handler.setCentralCity(sratov);
+        handler.setCentralCity(51.528594f, 46.027980f, "Саратов");
 
         // зона одц
         handler.addCity(51.475426f, 46.101825f, 4,  "Энгельс");
@@ -46,7 +45,7 @@ public class TestCityHandler {
 
         handler.calcCoefficientPlacement();
 
-        handler.filterRelativeCentralCity();
+        handler.exclusionOfCitiesRelativeToCentral();
 
         handler.aggregatedCitiesByServiceArea();
 
